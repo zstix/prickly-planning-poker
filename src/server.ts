@@ -4,7 +4,10 @@ import * as express from "express";
 import * as WebSocket from "ws";
 import * as favicon from "serve-favicon";
 
+import generateName from "./generateName";
+
 interface Client {
+  name: string;
   vote?: number | null;
 }
 
@@ -41,6 +44,7 @@ wsServer.on("connection", (ws: WebSocket, req: http.IncomingMessage) => {
 
   state.clients[key] = {
     vote: undefined,
+    name: generateName(),
   };
 
   const sendState = (type: string) => {

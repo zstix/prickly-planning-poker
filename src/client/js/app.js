@@ -68,8 +68,8 @@ class App extends Component {
   render(_props, state) {
     return html`
       <ul class="players">
-        ${Object.entries(state.clients).map(([id, client]) =>
-          Player({ id, client })
+        ${Object.entries(state.clients).map(([_id, client]) =>
+          Player({ client })
         )}
       </ul>
       <button class="flip" onClick=${() => this.setVoting()}>
