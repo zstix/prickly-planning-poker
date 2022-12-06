@@ -4,6 +4,15 @@ import * as express from "express";
 import * as WebSocket from "ws";
 import * as favicon from "serve-favicon";
 
+interface Client {
+  vote?: number;
+}
+
+interface AppState {
+  clients: Record<string, Client>;
+  voting: boolean;
+}
+
 const PORT = process.env.PORT || 8999;
 
 const app = express();
@@ -15,13 +24,27 @@ const server = http.createServer(app);
 
 const wsServer = new WebSocket.Server({ server });
 
-wsServer.on("connection", (ws: WebSocket) => {
+const state: AppState = {
+  clients: {},
+  voting: true,
+};
+
+wsServer.on("connection", (ws: WebSocket, req: http.IncomingMessage) => {
+  state.clients[req.socket.remoteAddress!] = {
+    vote: undefined,
+  };
+
   ws.on("message", (message: string) => {
     console.log("recieved: %s", message);
     ws.send(`Hello, you sent -> ${message}`);
   });
 
-  ws.send("Hi there, I am a WebSocket server");
+  ws.send(
+    JSON.stringify({
+      type: "connection",
+      state,
+    })
+  );
 });
 
 app.get("/", (_req, res) => {

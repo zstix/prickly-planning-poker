@@ -8,9 +8,32 @@ import Card from "./card.js";
 const CARD_VALS = [1, 2, 3, 5, 8, 13, "?"];
 
 class App extends Component {
+  ws = new WebSocket("ws://127.0.0.1:8999");
+
   state = {
     selected: null,
     voting: true,
+    clients: [],
+  };
+
+  componentDidMount() {
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+        case "connection": // TODO: constants
+          console.log(data.state);
+          this.updatePlayers(data.state);
+          break;
+      }
+    };
+  }
+
+  // TODO; update everything?
+  updatePlayers = (serverState) => {
+    this.setState({
+      ...this.state,
+      ...serverState,
+    });
   };
 
   setSelected = (selected) => {
@@ -22,9 +45,9 @@ class App extends Component {
   render(_props, state) {
     return html`
       <ul class="players">
-        <li>User A ✅</li>
-        <li>User B</li>
-        <li>User C</li>
+        ${Object.entries(state.clients).map(
+          ([client]) => html` <li>${client}</li> `
+        )}
       </ul>
       <button
         class="flip"
