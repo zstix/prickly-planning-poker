@@ -4,6 +4,7 @@ import {
   render,
 } from "https://unpkg.com/htm/preact/standalone.module.js";
 import Card from "./card.js";
+import Player from "./player.js";
 
 const CARD_VALS = [1, 2, 3, 5, 8, 13, "?"];
 
@@ -19,40 +20,58 @@ class App extends Component {
   componentDidMount() {
     this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      switch (data.type) {
-        case "connection": // TODO: constants
-          console.log(data.state);
-          this.updatePlayers(data.state);
-          break;
+      this.syncState(data.state);
+      if (data.type == "flip" && !data.state.voting) {
+        this.setState({ selected: null });
       }
     };
   }
 
-  // TODO; update everything?
-  updatePlayers = (serverState) => {
+  syncState = (serverState) => {
     this.setState({
       ...this.state,
       ...serverState,
     });
   };
 
-  setSelected = (selected) => {
-    this.setState((prev) => ({
-      selected: prev.selected == selected ? null : selected,
-    }));
+  setSelected = (val) => {
+    this.setState((prev) => {
+      const selected = prev.selected == val ? null : val;
+
+      this.ws.send(
+        JSON.stringify({
+          type: "vote",
+          payload: selected,
+        })
+      );
+
+      return { ...prev, selected };
+    });
+  };
+
+  setVoting = () => {
+    this.setState((prev) => {
+      const voting = !prev.voting;
+
+      this.ws.send(
+        JSON.stringify({
+          type: "flip",
+          payload: voting,
+        })
+      );
+
+      return { ...prev, voting };
+    });
   };
 
   render(_props, state) {
     return html`
       <ul class="players">
-        ${Object.entries(state.clients).map(
-          ([client]) => html` <li>${client}</li> `
+        ${Object.entries(state.clients).map(([id, client]) =>
+          Player({ id, client })
         )}
       </ul>
-      <button
-        class="flip"
-        onClick=${() => this.setState({ voting: !state.voting })}
-      >
+      <button class="flip" onClick=${() => this.setVoting()}>
         ${state.voting ? "Flip" : "Reset"}!
       </button>
       ${state.voting
