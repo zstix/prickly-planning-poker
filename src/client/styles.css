@@ -56,11 +56,13 @@ body {
   box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.05);
 }
 
-.cards {
+.cards,
+.votes {
   display: flex;
 }
 
-.cards > li {
+.cards > li,
+.votes > li {
   color: red;
   width: 5rem;
   height: 9rem;
@@ -75,7 +77,8 @@ body {
   transition: all linear 0.1s;
 }
 
-.cards > li > span {
+.cards > li > span,
+.votes > li > span {
   width: 100%;
   text-align: center;
 }
@@ -86,7 +89,8 @@ body {
   box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.2);
 }
 
-.cards > li.unknown {
+.cards > li.unknown,
+.votes > li.unknown {
   background-color: lightgrey;
   color: dimgrey;
 }

@@ -69,7 +69,7 @@ wsServer.on("connection", (ws: WebSocket, req: http.IncomingMessage) => {
         break;
       case "flip":
         state.voting = data.payload as boolean;
-        if (!state.voting) {
+        if (state.voting) {
           resetVotes();
         }
         sendState("flip");

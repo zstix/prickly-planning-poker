@@ -5,6 +5,7 @@ import {
 } from "https://unpkg.com/htm/preact/standalone.module.js";
 import Card from "./card.js";
 import Player from "./player.js";
+import Score from "./score.js";
 
 const CARD_VALS = [1, 2, 3, 5, 8, 13, "?"];
 
@@ -84,7 +85,7 @@ class App extends Component {
               })
             )}
           </ul>`
-        : html`<div>score</div>`}
+        : Score({ clients: state.clients })}
     `;
   }
 }
